@@ -1,3 +1,10 @@
+% File to load
+% file = './r0s.wav';
+file = 'r0.wav';
+
+% Load the audio files
+[x fs] = wavread(file);
+t = (1:size(x,1)) / fs;
 
 
 %% Using data from r0.csv
