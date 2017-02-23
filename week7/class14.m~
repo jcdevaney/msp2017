@@ -1,6 +1,6 @@
 close all
 
-% % summarising fundamental frequency information
+% summarising fundamental frequency information
 load yinVals.mat
 labels=load('avm-fixed.txt');
 [x,sr]=audioread('avm.wav');
@@ -77,7 +77,7 @@ load loudness.mat
 % f0s=2.^yinVals.f0(labels(2,1)*sr/32:labels(2,2)*sr/32)*440;
 % perceivedPitch(f0s,sr)
 for i = 1 : length(labels)
-    perceived pitch
+    % perceived pitch
     f0Vals=2.^yinVals.f0(ceil(labels(i,1)*yinVals.sr/yinVals.hop):floor(labels(i,2)*yinVals.sr/yinVals.hop))*440;
     cents=yinVals.f0(ceil(labels(i,1)*yinVals.sr/yinVals.hop):floor(labels(i,2)*yinVals.sr/yinVals.hop));
     pp(i)=perceivedPitch(f0Vals, 1/yinVals.sr*yinVals.hop, 100000);
@@ -108,16 +108,17 @@ for i = 1 : length(labels)
     sprintf('Note %i: The vibrato rate is %0.2f and the vibrato depth is %0.2f\n', i, vibratoRate(i), vibratoDepth(i))
     
     % summarizing power data using root mean square    
-    pwrVals=yinVals.pwr(ceil(labels(i,1)*yinVals.sr/yinVals.hop):floor(labels(i,2)*yinVals.sr/yinVals.hop));
+    pwrVals=sqrt(yinVals.pwr(ceil(labels(i,1)*yinVals.sr/yinVals.hop):floor(labels(i,2)*yinVals.sr/yinVals.hop)));
     rmsCalc=rms(pwrVals(~isnan(pwrVals)));
+    format short g
     figure(5)
     subplot(2,3,i)
-    plot(pwrVals)
+    plot(t,pwrVals)
     title(sprintf('Note %i PwrVals',i))
     xlabel('Seconds')
     ylabel('Sqrt(Pwr)')     
     hold on
-    plot(ones(1,length(pwrVals))*rmsCalc,'r')
+    plot(t,ones(1,length(pwrVals))*rmsCalc,'r')
     hold off
     
     sprintf('Note %i: The RMS value is %f', i, rmsCalc)
