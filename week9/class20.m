@@ -1,10 +1,12 @@
 
 % load data
-% versions=[1:6];
-% pSingers=[1 2 3 5 6 9];
-% npSingers=[1 2 5 6 7 8];
-% 
-% [avmP,avmNP]=loadAVMdata('avmVals.mat','avmLoudness.mat',pSingers,npSingers,versions);
+% avmVals.mat and avmLoudness.mat are too big to upload to github, so you'll need to download them at
+% https://www.dropbox.com/s/n2ku0xbgz77hs10/avmVals.mat?dl=0
+% https://www.dropbox.com/s/1x0jouszjhabtf1/avmLoudness.mat?dl=0
+versions=[1:6];
+pSingers=[1 2 3 5 6 9];
+npSingers=[1 2 5 6 7 8];
+[avmP,avmNP]=loadAVMdata('avmVals.mat','avmLoudness.mat',pSingers,npSingers,versions);
 
 
 % configuration data for SVM and run SVM using the svm library liblinear 
@@ -72,6 +74,8 @@ for f = 1 : length(fieldnames)
     openCloseAcapNPvals(f)=openCloseAcapNP{f}.accuracy(1);
     openCloseAccomPvals(f)=openCloseAccomP{f}.accuracy(1);
     openCloseAccomNPvals(f)=openCloseAccomNP{f}.accuracy(1);
+    openClosePvals(f)=openCloseP{f}.accuracy(1);
+    openCloseNPvals(f)=openCloseNP{f}.accuracy(1);    
 end
 
 % generate and plot confusion matrices
@@ -146,9 +150,6 @@ for cv = 1 : length(trainVals)
     gtLabels=[gtLabels listeningTestLabelP];   
     features{cv}=lookAtFeatures(listeningSVM{cv}.model.w,size(fieldnames{1},2));
 end
-
-% summarize accuracy
-mean(listeningAccuracy)
 
 % plot confusion matrix
 figure(2)
@@ -376,7 +377,17 @@ subject{16}=[4	4
 allSubjects=[subject{:}];
 
 % human accuracy
-humanAccuracy=nnz(find(abs(diff(allSubjects))))/length(allSubjects)*100
+humanAccuracy=nnz(find(abs(diff(allSubjects))))/length(allSubjects)*100;
 
 figure(3)
 plotConfMat(allSubjects(1,:),allSubjects(2,:), 'Professional (a capella) - 6 alternative forced choice listening test on opening', 'openAcapPlisten_CM')
+
+% print summary statistics
+sprintf('Combined results of training on opening and testing on closing and vice versa')
+sprintf('The accuracy for the non-professionals a cappella performances was %0.1f for all features, %0.1f for pitch features, %0.1f for timing features, and %0.1f for loudness features.',openCloseAcapNPvals(1),openCloseAcapNPvals(2),openCloseAcapNPvals(3),openCloseAcapNPvals(4)) 
+sprintf('The accuracy for the professionals a cappella performances was %0.1f for all features, %0.1f for pitch features, %0.1f for timing features, and %0.1f for loudness features.',openCloseAcapPvals(1),openCloseAcapPvals(2),openCloseAcapPvals(3),openCloseAcapPvals(4)) 
+sprintf('The accuracy for the non-professionals accompanied performances was %0.1f for all features, %0.1f for pitch features, %0.1f for timing features, and %0.1f for loudness feature.s',openCloseAccomNPvals(1),openCloseAccomNPvals(2),openCloseAccomNPvals(3),openCloseAccomNPvals(4)) 
+sprintf('The accuracy for the professionals accompanied performances was %0.1f for all features, %0.1f for pitch features, %0.1f for timing features, and %0.1f for loudness features.',openCloseAccomPvals(1),openCloseAccomPvals(2),openCloseAccomPvals(3),openCloseAccomPvals(4)) 
+
+
+sprintf('The accuracy for the human listeners on the professionals a cappella performances was %0.1f and the leave-one out compuational model on the same recordings was %0.1f.',humanAccuracy,mean(listeningAccuracy)) 
